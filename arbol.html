@@ -1,0 +1,327 @@
+<!-- https://www.tiktok.com/@bryanmql -->
+<!-- https://www.instagram.com/bryan_mql -->
+<!-- https://www.youtube.com/@bryanmql -->
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎄 Árbol de Navidad 🌟</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎄</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b1120;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #info-card {
+            z-index: 10;
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            padding: 1rem 2rem;
+            background-color: rgba(16, 24, 40, 0.8);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            font-size: 0.875rem;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        #info-card h1 {
+            font-size: 2.5rem;
+            letter-spacing: 0.15em;
+            text-shadow: 0 0 10px rgba(255, 77, 136, 0.8),
+                0 0 20px rgba(255, 77, 136, 0.6),
+                0 0 30px rgba(255, 77, 136, 0.4);
+            animation: neonGlow 3s ease-in-out infinite;
+            margin: 0;
+            padding-bottom: 10px;
+        }
+
+        #info-card p {
+            font-size: 1.3rem;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 8px rgba(255, 221, 170, 0.6),
+                0 0 15px rgba(255, 221, 170, 0.4);
+            animation: neonGlow 3.5s ease-in-out infinite;
+            margin: 0.5rem 0 0 0;
+        }
+
+        @keyframes neonGlow {
+
+            0%,
+            100% {
+                text-shadow: 0 0 10px rgba(255, 77, 136, 0.8),
+                    0 0 20px rgba(255, 77, 136, 0.6),
+                    0 0 30px rgba(255, 77, 136, 0.4);
+            }
+
+            50% {
+                text-shadow: 0 0 20px rgba(255, 77, 136, 1),
+                    0 0 30px rgba(255, 77, 136, 0.8),
+                    0 0 40px rgba(255, 77, 136, 0.6),
+                    0 0 50px rgba(255, 77, 136, 0.4);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="info-card">
+        <h1 class="font-bold text-xl mb-1 text-pink-300">Merry Christmas</h1>
+        <p class="text-xs text-gray-300">🎄2025🌟</p>
+    </div>
+
+    <script>
+        let scene, camera, renderer, treeGroup, starGroup, backgroundStarGroup;
+        let lights = [];
+        let animationTime = 0;
+
+        const totalLightCount = 500;
+        const backgroundStarCount = 650;
+        const backgroundStarRadius = 50;
+        const lightColors = [
+            0xff0000, // Rojo brillante
+            0x00ff00, // Verde lima
+            0xffffff, // Blanco
+        ];
+        const starLightColor = 0xffffaa;
+        const lightUpDuration = 1.5;
+        const spiralTurns = 10;
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0x0b1120, 10, 50);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 15;
+            camera.position.y = 5;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+            document.body.appendChild(renderer.domElement);
+
+            treeGroup = new THREE.Group();
+            scene.add(treeGroup);
+
+            starGroup = new THREE.Group();
+            starGroup.rotation.z = 38 * Math.PI / 180;
+            scene.add(starGroup);
+
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+            scene.add(ambientLight);
+
+            createBackgroundStars();
+            createTreeLights();
+            createStar();
+
+            window.addEventListener('resize', onWindowResize, false);
+        }
+
+
+        function createBackgroundStars() {
+            const starGeometry = new THREE.SphereGeometry(0.05, 4, 4);
+            backgroundStarGroup = new THREE.Group();
+
+            const starColors = [0xeeeeff, 0xffddee, 0xddeeff];
+
+            for (let i = 0; i < backgroundStarCount; i++) {
+                const color = starColors[Math.floor(Math.random() * starColors.length)];
+
+                const material = new THREE.MeshBasicMaterial({
+                    color: color,
+                    emissive: color,
+                    emissiveIntensity: 0.5,
+                    transparent: true,
+                    opacity: 0.1
+                });
+
+                const mesh = new THREE.Mesh(starGeometry, material);
+
+                const distance = Math.random() * backgroundStarRadius;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos((Math.random() * 2) - 1);
+
+                mesh.position.x = distance * Math.sin(phi) * Math.cos(theta);
+                mesh.position.y = distance * Math.sin(phi) * Math.sin(theta);
+                mesh.position.z = distance * Math.cos(phi);
+
+                mesh.pulseOffset = Math.random() * Math.PI * 2;
+
+                backgroundStarGroup.add(mesh);
+            }
+            scene.add(backgroundStarGroup);
+        }
+
+        function createTreeLights() {
+            const lightGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+            const height = 12;
+            const baseRadius = 4.5;
+            const yOffset = height / 3;
+
+            for (let i = 0; i < totalLightCount; i++) {
+                const step = i / totalLightCount;
+                const y = step * height;
+                const normalizedY = 1 - step;
+
+                const currentRadius = baseRadius * normalizedY;
+
+                const angle = step * spiralTurns * Math.PI * 2;
+
+                const jitter = (Math.random() - 0.5) * 0.5;
+
+                const x = currentRadius * Math.cos(angle) + jitter;
+                const z = currentRadius * Math.sin(angle) + jitter;
+
+                const color = lightColors[Math.floor(Math.random() * lightColors.length)];
+
+                const lightMaterial = new THREE.MeshBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.05,
+                    emissive: color,
+                    emissiveIntensity: 0.8
+                });
+
+                const mesh = new THREE.Mesh(lightGeometry, lightMaterial);
+                mesh.position.set(x, y - yOffset, z);
+                mesh.originalY = y - yOffset;
+                mesh.normalizedY = normalizedY;
+                mesh.colorIndex = lightColors.indexOf(color);
+                mesh.pulseOffset = Math.random() * Math.PI * 2;
+                mesh.originalScale = 1.0;
+
+                lights.push(mesh);
+                treeGroup.add(mesh);
+            }
+        }
+
+        function createStar() {
+            const starRadius = 1.6;
+            const numPoints = 5;
+            const innerRatio = 0.4;
+            const numStarLights = 2200;
+
+            const starLightGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+
+            const starOutline = [];
+            for (let i = 0; i < numPoints * 2; i++) {
+                const r = (i % 2 === 0) ? starRadius : starRadius * innerRatio;
+                const angle = (i / (numPoints * 2)) * Math.PI * 2 - Math.PI / 2; // Iniciar en la parte superior
+                starOutline.push(new THREE.Vector2(r * Math.cos(angle), r * Math.sin(angle)));
+            }
+
+            for (let i = 0; i < numStarLights; i++) {
+                const position = new THREE.Vector3();
+                const randomPointIndex = Math.floor(Math.random() * starOutline.length);
+                const randomNextPointIndex = (randomPointIndex + 1) % starOutline.length;
+
+                const p1 = starOutline[randomPointIndex];
+                const p2 = starOutline[randomNextPointIndex];
+
+                const t = Math.random();
+                position.x = p1.x * (1 - t) + p2.x * t;
+                position.y = p1.y * (1 - t) + p2.y * t;
+                position.z = (Math.random() - 0.5) * 0.3;
+
+                position.multiplyScalar(Math.random() * 0.8 + 0.2);
+
+                const starLightMaterial = new THREE.MeshBasicMaterial({
+                    color: starLightColor,
+                    emissive: starLightColor,
+                    emissiveIntensity: 1.5,
+                    transparent: true,
+                    opacity: 0
+                });
+                const starMesh = new THREE.Mesh(starLightGeometry, starLightMaterial);
+                starMesh.position.copy(position);
+                starGroup.add(starMesh);
+            }
+
+            starGroup.position.set(0, 9, 0);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = 0.016;
+            animationTime += delta;
+
+            treeGroup.rotation.y += 0.035;
+            starGroup.rotation.y += 0.035;
+            backgroundStarGroup.rotation.y += 0.0020;
+
+            const lightUpProgress = Math.min(1, animationTime / lightUpDuration);
+
+            lights.forEach(light => {
+                if (lightUpProgress > 0) {
+                    if (light.normalizedY >= 1 - lightUpProgress - 0.05) {
+                        const pulseSpeed = 4 + (light.colorIndex * 0.5);
+                        const pulse = Math.sin(animationTime * pulseSpeed + light.pulseOffset) * 0.4 + 0.6;
+
+                        light.material.opacity = pulse;
+                        light.scale.setScalar(pulse * light.originalScale);
+                        light.material.emissiveIntensity = pulse * 0.8;
+                    } else {
+                        light.material.opacity = 0.05;
+                        light.scale.setScalar(0.1);
+                    }
+                }
+            });
+
+            if (starGroup.children.length > 0 && lightUpProgress >= 0.95) {
+                starGroup.children.forEach(starLight => {
+                    starLight.material.opacity = 1.0;
+                    starLight.scale.setScalar(1.2);
+                    starLight.material.emissiveIntensity = 2.0;
+                });
+            } else if (starGroup.children.length > 0) {
+                starGroup.children.forEach(starLight => {
+                    starLight.material.opacity = 0;
+                });
+            }
+
+            backgroundStarGroup.children.forEach(star => {
+                const pulseSpeed = 0.5;
+                const pulse = Math.sin(animationTime * pulseSpeed + star.pulseOffset) * 0.4 + 0.6;
+
+                star.material.opacity = pulse * 0.5;
+                star.material.emissiveIntensity = pulse * 1.0;
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        window.onload = function () {
+            init();
+            animate();
+        };
+
+    </script>
+</body>
+</html>
+<!-- https://www.tiktok.com/@bryanmql -->
+<!-- https://www.instagram.com/bryan_mql -->
+<!-- https://www.youtube.com/@bryanmql -->

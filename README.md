@@ -1,6 +1,6 @@
 # 🎄 Árbol de Navideño
 
-Un árbol navideño interactivo en 3D con efectos de iluminación dinámica, animaciones en espiral y un cielo estrellado de fondo.
+Un árbol navideño en 3D con efectos de iluminación dinámica, animaciones en espiral y un cielo estrellado de fondo.
 
 ## 🛠️ Tecnología Utilizada
 
